@@ -18,6 +18,7 @@ export default function Home() {
               <span>⏳ Incomplete</span>
             )}
           </h2>
+          <p>Created at: {task.createdAt.toDateString()}</p>
         </div>
       ))}
     </main>
