@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Show, SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default async function Home() {
   const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -32,7 +33,7 @@ export default async function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {courses.slice(0, 3).map((course) => (
             <Card key={course._id} className="flex flex-col h-full">
               <Link
@@ -84,6 +85,18 @@ export default async function Home() {
               </CardFooter>
             </Card>
           ))}
+        </div>
+
+        <div className="text-center">
+          <Link href="/pro">
+            <Button
+              size="lg"
+              className="group hover:bg-purple-600 transition-colors duration-300"
+            >
+              Explore Pro Plans
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
         </div>
       </main>
     </div>
