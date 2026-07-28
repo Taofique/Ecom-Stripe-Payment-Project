@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import PurchaseButton from "@/components/PurchaseButton";
 import { Download, FileTextIcon, Lock, PlayCircle } from "lucide-react";
 
 const CourseDetailPage = () => {
@@ -97,7 +98,7 @@ const CourseDetailPage = () => {
                   ${courseData.price.toFixed(2)}
                 </p>
 
-                {/* <PurchaseButton courseId={params.courseId} /> */}
+                <PurchaseButton courseId={params.courseId} />
               </div>
             </div>
           )}
