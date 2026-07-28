@@ -6,7 +6,8 @@ import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { notFound, useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 const CourseDetailPage = () => {
   const params = useParams<{ courseId: Id<"courses"> }>();
@@ -34,7 +35,25 @@ const CourseDetailPage = () => {
     return notFound();
   }
 
-  return <div>course id page</div>;
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <Image
+            src={courseData.imageUrl}
+            alt={courseData.title}
+            width={1200}
+            height={600}
+            className="rounded-md object-cover w-full"
+          />
+        </CardHeader>
+
+        <CardContent>
+          <CardTitle className="text-3xl mb-4">{courseData.title}</CardTitle>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default CourseDetailPage;
