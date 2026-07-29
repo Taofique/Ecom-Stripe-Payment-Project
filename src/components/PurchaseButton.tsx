@@ -3,7 +3,7 @@
 import { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
@@ -18,6 +18,8 @@ const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
     user ? { clerkId: user?.id } : "skip",
   );
 
+  const createCheckoutSession = useAction(api.stripe.createCheckoutSession);
+
   const userAccess = useQuery(
     api.users.getUserAccess,
     userData
@@ -29,7 +31,23 @@ const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
   ) || { hasAccess: false };
 
   const handlePurchase = async () => {
-    // .....
+    if (!user) return alert("Please login to purchase");
+    setIsLoading(true);
+
+    try {
+      const { checkoutUrl } = await createCheckoutSession({ courseId });
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
+    } catch (error: any) {
+      //todo: handle error later
+
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!userAccess.hasAccess) {
