@@ -8,6 +8,7 @@ import { Loader2Icon } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -47,9 +48,14 @@ const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
       }
 
       window.location.href = checkoutUrl;
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Please try again.");
+    } catch (error: any) {
+      if (error.message.includes("Rate limit exceeded")) {
+        toast.error("You've tried too many times, Please try again later.");
+      } else {
+        toast.error(
+          error.message || "Something went wrong. Please try again later.",
+        );
+      }
     } finally {
       setIsLoading(false);
     }
