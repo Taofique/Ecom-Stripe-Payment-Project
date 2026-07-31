@@ -1,12 +1,13 @@
 "use client";
 
-import { Id } from "../../convex/_generated/dataModel";
-import { api } from "../../convex/_generated/api";
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useAction, useQuery } from "convex/react";
-import { Button } from "./ui/button";
-import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
+
+import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
+import { Button } from "./ui/button";
 
 const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,61 +16,82 @@ const PurchaseButton = ({ courseId }: { courseId: Id<"courses"> }) => {
 
   const userData = useQuery(
     api.users.getUserByClerkId,
-    user ? { clerkId: user?.id } : "skip",
+    user ? { clerkId: user.id } : "skip",
   );
-
-  const createCheckoutSession = useAction(api.stripe.createCheckoutSession);
 
   const userAccess = useQuery(
     api.users.getUserAccess,
     userData
       ? {
-          userId: userData?._id,
+          userId: userData._id,
           courseId,
         }
       : "skip",
-  ) || { hasAccess: false };
+  ) ?? { hasAccess: false };
+
+  const createCheckoutSession = useAction(api.stripe.createCheckoutSession);
 
   const handlePurchase = async () => {
-    if (!user) return alert("Please login to purchase");
+    if (!user) {
+      alert("Please login to purchase");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const { checkoutUrl } = await createCheckoutSession({ courseId });
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
+
+      if (!checkoutUrl) {
         throw new Error("Failed to create checkout session");
       }
-    } catch (error: any) {
-      //todo: handle error later
 
-      console.log(error);
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!userAccess.hasAccess) {
+  if (isLoading) {
     return (
-      <Button variant="outline" onClick={handlePurchase} disabled={isLoading}>
-        Enroll now
+      <Button
+        variant="outline"
+        size="sm"
+        className="hidden sm:flex items-center gap-2"
+        disabled
+      >
+        <Loader2Icon className="h-4 w-4 animate-spin" />
+        Processing...
       </Button>
     );
   }
 
   if (userAccess.hasAccess) {
-    return <Button variant="outline">Enrolled</Button>;
-  }
-
-  if (isLoading) {
     return (
-      <Button>
-        <Loader2Icon className="mr-2 size-4 animate-spin" />
-        Processing...
+      <Button
+        variant="outline"
+        size="sm"
+        className="hidden sm:flex items-center gap-2"
+        disabled
+      >
+        Enrolled
       </Button>
     );
   }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="hidden sm:flex items-center gap-2"
+      onClick={handlePurchase}
+    >
+      Enroll Now
+    </Button>
+  );
 };
 
 export default PurchaseButton;

@@ -53,13 +53,7 @@ const page = async () => {
               </Badge>
 
               <Show when="signed-in">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex items-center gap-2"
-                >
-                  <PurchaseButton courseId={course._id} />
-                </Button>
+                <PurchaseButton courseId={course._id} />
               </Show>
 
               <Show when="signed-out">
