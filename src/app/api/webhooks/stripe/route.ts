@@ -2,6 +2,8 @@ import Stripe from "stripe";
 import stripe from "@/lib/stripe";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
+import { Id } from "../../../../../convex/_generated/dataModel";
+import { NextResponse } from "next/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -35,7 +37,13 @@ export async function POST(req: Request) {
         console.log(`Unhandled event type: ${event.type}`);
         break;
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error(`Error processing webhook (${event.type}):`, error);
+    return NextResponse.json(
+      { error: "Error processing webhook" },
+      { status: 500 },
+    );
+  }
 }
 
 async function handleCheckoutSessionCompleted(
@@ -60,4 +68,13 @@ async function handleCheckoutSessionCompleted(
   if (!user) {
     throw new Error("User not found");
   }
+
+  await convex.mutation(api.purchases.recordPurchase, {
+    userId: user._id,
+    courseId: courseId as Id<"courses">,
+    amount: session.amount_total as number,
+    stripePurchaseId: session.id,
+  });
+
+  // todo: send success email to user.
 }
