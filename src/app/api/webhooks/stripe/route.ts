@@ -41,9 +41,11 @@ export async function POST(req: Request) {
     console.error(`Error processing webhook (${event.type}):`, error);
     return NextResponse.json(
       { error: "Error processing webhook" },
-      { status: 500 },
+      { status: 400 },
     );
   }
+
+  return new Response(null, { status: 200 });
 }
 
 async function handleCheckoutSessionCompleted(
