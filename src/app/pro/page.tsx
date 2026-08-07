@@ -82,7 +82,9 @@ const ProPage = () => {
         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded-md">
           <p className="text-blue-700">
             You have an active{" "}
-            <span className="font-semibold">{userSubscription.planType}</span>
+            <span className="font-semibold">
+              {userSubscription.planType === "month" ? "monthly" : "yearly"}
+            </span>{" "}
             subscription
           </p>
         </div>
