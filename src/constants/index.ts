@@ -1,4 +1,14 @@
-export const PRO_PLANS = [
+type ProPlan = {
+  id: "month" | "year";
+  title: string;
+  price: string;
+  period: string;
+  features: string[];
+  ctaText: string;
+  highlighted?: boolean;
+};
+
+export const PRO_PLANS: ProPlan[] = [
   {
     id: "month",
     title: "Monthly Pro",
