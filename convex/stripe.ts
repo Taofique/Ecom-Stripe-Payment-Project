@@ -80,7 +80,7 @@ export const createCheckoutSession = action({
 
 export const createProPlanCheckoutSession = action({
   args: {
-    planId: v.string(),
+    planId: v.union(v.literal("month"), v.literal("year")),
   },
   handler: async (ctx, args): Promise<{ checkoutUrl: string | null }> => {
     const identity = await ctx.auth.getUserIdentity();
@@ -103,5 +103,34 @@ export const createProPlanCheckoutSession = action({
     if (!success) {
       throw new Error(`Rate limit exceeded.`);
     }
+
+    // month or year
+    let priceId;
+
+    if (args.planId === "month") {
+      priceId = process.env.STRIPE_MONTHLY_PRICE_ID;
+    } else if (args.planId === "year") {
+      priceId = process.env.STRIPE_YEARLY_PRICE_ID;
+    }
+
+    if (!priceId) {
+      throw new Error("PriceId not provided");
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: user.stripeCustomerId,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pro/success?session_id={CHECKOUT_SESSION_ID}&year=${args.planId === "year"}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pro`,
+      metadata: { userId: user._id, planId: args.planId },
+    });
+
+    return { checkoutUrl: session.url };
   },
 });
