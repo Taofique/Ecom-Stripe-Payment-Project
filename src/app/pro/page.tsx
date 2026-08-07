@@ -33,7 +33,7 @@ const ProPage = () => {
     userSubscription?.status === "active" &&
     userSubscription.planType === "year";
 
-  const handlePlanSelection = (planId: "month" | "year") => {
+  const handlePlanSelection = (planId: string) => {
     setLoadingPlan(planId);
   };
 
