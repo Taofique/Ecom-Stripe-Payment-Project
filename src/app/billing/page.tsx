@@ -22,10 +22,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const BillingPage = () => {
   const { user } = useUser();
-  const [isLoading, setIsLoading] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const userData = useQuery(
     api.users.getUserByClerkId,
@@ -38,7 +39,22 @@ const BillingPage = () => {
   );
 
   const handleManageBilling = async () => {
-    return;
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/create-billing-portal", {
+        method: "POST",
+      });
+      const url = await response.json();
+      if (url) window.location.href = url;
+      else throw new Error("Failed to create billing portal");
+    } catch (error: any) {
+      toast.error(
+        error.message || "Something went wrong, Please try again later.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatDate = (timestamp: number): string => {
