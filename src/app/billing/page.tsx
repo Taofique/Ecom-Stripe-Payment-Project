@@ -120,17 +120,16 @@ const BillingPage = () => {
                     {formatDate(subscription.currentPeriodEnd)}
                   </p>
                 </div>
-
-                {subscription.cancelAtPeriodEnd && (
-                  <div className="flex items-center bg-yellow-50 p-4 rounded-lg text-yellow-700">
-                    <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
-                    <p className="text-sm">
-                      Your subscription will be cancelled at the end of the
-                      current billing period.
-                    </p>
-                  </div>
-                )}
               </div>
+              {subscription.cancelAtPeriodEnd && (
+                <div className="flex items-center bg-yellow-50 p-4 rounded-lg text-yellow-700">
+                  <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <p className="text-sm">
+                    Your subscription will be cancelled at the end of the
+                    current billing period.
+                  </p>
+                </div>
+              )}
             </CardContent>
 
             <CardFooter className="flex justify-end bg-gray-50 mt-6">
