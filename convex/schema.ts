@@ -36,5 +36,6 @@ export default defineSchema({
     stripeSubscriptionId: v.string(),
     status: v.string(),
     cancelAtPeriodEnd: v.boolean(),
+    cancelAt: v.optional(v.number()), // <-- ADD THIS FIELD
   }).index("by_stripeSubscriptionId", ["stripeSubscriptionId"]),
 });

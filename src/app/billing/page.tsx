@@ -38,7 +38,28 @@ const BillingPage = () => {
     userData ? { userId: userData._id } : "skip",
   );
 
+  // Log subscription data when it changes
+  if (subscription !== undefined) {
+    console.log("=== BILLING PAGE SUBSCRIPTION DATA ===");
+    console.log("Subscription:", subscription);
+    console.log("cancelAtPeriodEnd:", subscription?.cancelAtPeriodEnd);
+    console.log("cancelAt:", subscription?.cancelAt);
+    console.log("status:", subscription?.status);
+    console.log("planType:", subscription?.planType);
+    console.log("currentPeriodEnd:", subscription?.currentPeriodEnd);
+    console.log("=== END BILLING PAGE SUBSCRIPTION DATA ===");
+  }
+
+  if (userData) {
+    console.log("=== BILLING PAGE USER DATA ===");
+    console.log("User ID:", userData._id);
+    console.log("Stripe Customer ID:", userData.stripeCustomerId);
+    console.log("Current Subscription ID:", userData.currentSubscriptionId);
+    console.log("=== END BILLING PAGE USER DATA ===");
+  }
+
   const handleManageBilling = async () => {
+    console.log("=== MANAGE BILLING CLICKED ===");
     setIsLoading(true);
 
     try {
@@ -46,14 +67,22 @@ const BillingPage = () => {
         method: "POST",
       });
       const { url } = await response.json();
-      if (url) window.location.href = url;
-      else throw new Error("Failed to create billing portal");
+      console.log("Billing portal URL:", url);
+      if (url) {
+        console.log("Redirecting to billing portal...");
+        window.location.href = url;
+      } else {
+        console.log("No URL received from billing portal API");
+        throw new Error("Failed to create billing portal");
+      }
     } catch (error: any) {
+      console.error("Error in handleManageBilling:", error);
       toast.error(
         error.message || "Something went wrong, Please try again later.",
       );
     } finally {
       setIsLoading(false);
+      console.log("=== MANAGE BILLING COMPLETE ===");
     }
   };
 
@@ -70,12 +99,26 @@ const BillingPage = () => {
   };
 
   if (!userData || subscription === undefined) {
+    console.log("=== LOADING STATE ===");
+    console.log("userData:", userData);
+    console.log("subscription:", subscription);
+    console.log("=== END LOADING STATE ===");
+
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
       </div>
     );
   }
+
+  console.log("=== RENDERING BILLING PAGE ===");
+  console.log("Has subscription:", !!subscription);
+  console.log("cancelAtPeriodEnd value:", subscription?.cancelAtPeriodEnd);
+  console.log(
+    "Should show cancellation warning:",
+    subscription?.cancelAtPeriodEnd === true,
+  );
+  console.log("=== END RENDERING BILLING PAGE ===");
 
   return (
     <div className="container mx-auto py-12 px-4 max-w-4xl">
@@ -121,6 +164,7 @@ const BillingPage = () => {
                   </p>
                 </div>
               </div>
+
               {subscription.cancelAtPeriodEnd && (
                 <div className="flex items-center bg-yellow-50 p-4 rounded-lg text-yellow-700">
                   <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
