@@ -13,8 +13,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const BillingPage = () => {
   const { user } = useUser();
@@ -51,10 +58,10 @@ const BillingPage = () => {
       <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
         Billing Management
       </h1>
-      <Card className="w-full shadow-lg border-0 overflow-hidden">
+      <Card className="w-full shadow-lg border-0 overflow-hidden p-0">
         {subscription ? (
           <>
-            <CardHeader className="pb-0">
+            <CardHeader className="pt-6 pb-0">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <CheckCircle2 className="h-6 w-6 text-green-500" />
                 Active Subscription
@@ -120,7 +127,29 @@ const BillingPage = () => {
             </CardFooter>
           </>
         ) : (
-          <div></div>
+          <>
+            <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-2 w-full"></div>
+            <CardHeader>
+              <CardTitle className="text-2xl text-gray-800 font-bold flex items-center gap-2">
+                <CreditCard className="h-6 w-6 text-gray-600" />
+                No Active Subscription
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Upgrade to Pro to unlock premium features
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center py-12">
+              <p className="text-lg mb-6 text-gray-700">
+                Get access to exclusive content and features with our Pro plan.
+              </p>
+              <Link href="/pro">
+                <Button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
+                  <Zap className="mr-2 h-5 w-5" />
+                  Explore Pro Plans
+                </Button>
+              </Link>
+            </CardContent>
+          </>
         )}
       </Card>
     </div>
