@@ -45,7 +45,7 @@ const BillingPage = () => {
       const response = await fetch("/api/create-billing-portal", {
         method: "POST",
       });
-      const url = await response.json();
+      const { url } = await response.json();
       if (url) window.location.href = url;
       else throw new Error("Failed to create billing portal");
     } catch (error: any) {
@@ -68,6 +68,14 @@ const BillingPage = () => {
 
     return date.toLocaleDateString("en-US", options);
   };
+
+  if (!userData || subscription === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-12 px-4 max-w-4xl">
