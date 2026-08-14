@@ -9,10 +9,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const BillingPage = () => {
   const { user } = useUser();
@@ -28,7 +30,9 @@ const BillingPage = () => {
     userData ? { userId: userData._id } : "skip",
   );
 
-  const handleManageBilling = async () => {};
+  const handleManageBilling = async () => {
+    return;
+  };
 
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp * 1000);
@@ -51,7 +55,7 @@ const BillingPage = () => {
         {subscription ? (
           <>
             <CardHeader className="pb-0">
-              <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <CheckCircle2 className="h-6 w-6 text-green-500" />
                 Active Subscription
               </CardTitle>
@@ -69,8 +73,51 @@ const BillingPage = () => {
                     {subscription.planType}
                   </p>
                 </div>
+
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Status</p>
+                  <p className="text-lg font-semibold text-gray-800 capitalize">
+                    {subscription.status}
+                  </p>
+                </div>
+
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-gray-500">
+                    Next billing date
+                  </p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {formatDate(subscription.currentPeriodEnd)}
+                  </p>
+                </div>
+
+                {subscription.cancelAtPeriodEnd && (
+                  <div className="flex items-center bg-yellow-50 p-4 rounded-lg text-yellow-700">
+                    <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <p className="text-sm">
+                      Your subscription will be cancelled at the end of the
+                      current billing period.
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
+
+            <CardFooter className="flex justify-end bg-gray-50 mt-6">
+              <Button
+                onClick={handleManageBilling}
+                disabled={isLoading}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Manage Billing"
+                )}
+              </Button>
+            </CardFooter>
           </>
         ) : (
           <div></div>
