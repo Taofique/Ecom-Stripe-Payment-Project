@@ -6,6 +6,7 @@ import { Id } from "../../../../../convex/_generated/dataModel";
 import { NextResponse } from "next/server";
 import resend from "@/lib/resend";
 import PurchaseConfirmationEmail from "@/emails/PurchaseConfirmationEmail";
+import ProPlanActivatedEmail from "@/emails/ProPlanActivatedEmail";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -197,9 +198,27 @@ async function handleSubscriptionUpsert(
     console.log(
       `✅ Successfully processed ${eventType} for subscription ${subscription.id}`,
     );
-    console.log(`   cancelAtPeriodEnd set to: ${cancelAtPeriodEnd}`);
-    console.log(`   cancelAt set to: ${subscription.cancel_at || "undefined"}`);
-    console.log("=== END WEBHOOK PROCESSING ===");
+
+    const isCreation = eventType === "customer.subscription.created";
+
+    if (isCreation) {
+      const result = resend.emails.send({
+        from: "MasterClass <onboarding@resend.dev>",
+        to: user.email,
+        subject: "Welcome to MasterClass Pro!",
+        react: ProPlanActivatedEmail({
+          name: user.name,
+          planType: subscription.items.data[0].plan.interval,
+          currentPeriodStart: subscriptionItem.current_period_start,
+          currentPeriodEnd: subscriptionItem.current_period_end,
+          url: process.env.NEXT_PUBLIC_APP_URL!,
+        }),
+      });
+
+      // debugging
+      console.log("Is Creation:", isCreation);
+      console.log("Resend result:", result);
+    }
   } catch (error) {
     console.error(
       `Error processing ${eventType} for subscription ${subscription.id}:`,
