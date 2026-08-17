@@ -4,6 +4,8 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { NextResponse } from "next/server";
+import resend from "@/lib/resend";
+import PurchaseConfirmationEmail from "@/emails/PurchaseConfirmationEmail";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -91,6 +93,25 @@ async function handleCheckoutSessionCompleted(
   });
 
   // todo: send success email to user.
+
+  if (
+    session.metadata &&
+    session.metadata.courseTitle &&
+    session.metadata.courseImageUrl
+  ) {
+    await resend.emails.send({
+      from: "MasterClass <onboarding@resend.dev>",
+      to: user.email,
+      subject: "Purchase Confirmed",
+      react: PurchaseConfirmationEmail({
+        customerName: user.name,
+        courseTitle: session.metadata?.courseTitle,
+        courseImage: session.metadata?.courseImageUrl,
+        courseUrl: `${process.env.NEXT_PUBLIC_APP_URL}/courses/${courseId}`,
+        purchaseAmount: session.amount_total! / 100,
+      }),
+    });
+  }
 }
 
 async function handleSubscriptionUpsert(
@@ -159,19 +180,6 @@ async function handleSubscriptionUpsert(
       );
     }
   }
-
-  console.log("=== MUTATION DATA BEING SENT TO CONVEX ===");
-  console.log({
-    userId: user._id,
-    stripeSubscriptionId: subscription.id,
-    status: subscription.status,
-    planType: (subscriptionItem.plan?.interval as "month" | "year") || "month",
-    currentPeriodStart: subscriptionItem.current_period_start,
-    currentPeriodEnd: subscriptionItem.current_period_end,
-    cancelAtPeriodEnd: cancelAtPeriodEnd,
-    cancelAt: subscription.cancel_at || undefined,
-  });
-  console.log("=== END MUTATION DATA ===");
 
   try {
     await convex.mutation(api.subscriptions.upsertSubscription, {
