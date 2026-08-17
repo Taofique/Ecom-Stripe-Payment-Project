@@ -4,6 +4,8 @@ import { Webhook } from "svix";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { api } from "./_generated/api";
 import stripe from "../src/lib/stripe";
+import resend from "../src/lib/resend";
+import WelcomeEmail from "../src/emails/WelcomeEmail";
 
 const http = httpRouter();
 
@@ -63,6 +65,25 @@ const clerkWebHook = httpAction(async (ctx, request) => {
         clerkId: id,
         stripeCustomerId: customer.id,
       });
+
+      // Debugging
+
+      console.log("✅ Convex user created");
+
+      console.log("📧 About to send welcome email");
+
+      console.log("NODE_ENV:", process.env.NODE_ENV);
+      console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+
+      //Todo: send Welcome Email
+      const result = await resend.emails.send({
+        from: "MasterClass <onboarding@resend.dev>",
+        to: email,
+        subject: "Welcome to MasterClass!",
+        react: WelcomeEmail({ name, url: process.env.NEXT_PUBLIC_APP_URL! }),
+      });
+
+      console.log("Resend Result:", result);
     } catch (error) {
       console.error("Error creating user in Convex", error);
       return new Response("Error creating user", { status: 500 });
